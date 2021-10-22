@@ -1,0 +1,13 @@
+# python
+.coverage
+venv
+
+# idea
+.idea/
+*.iml
+
+# files
+*.tmp
+*.csv
+*.json
+*.xml

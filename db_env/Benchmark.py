@@ -11,6 +11,6 @@ class Benchmark(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def run(self) -> float:
+    def execute(self) -> float:
         """:return: QphH metrics measured during executed benchmark."""
         raise NotImplementedError

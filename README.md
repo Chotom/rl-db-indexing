@@ -12,13 +12,23 @@ Create venv and install packages with:
 pip install -r requirements.txt
 ```
 
+## Tests
+Tests are store in _./test_ directory.
+Run tests for with code coverage:
+
+```shell
+coverage run -m unittest
+coverage report
+```
+
 ## Project structure
 
 ### db_env
 
 Package with database environment for agent.
 
-DatabaseEnvironment.py
+_DatabaseEnvironment.py_
+
 ```python
 from db_env.mock.MockDatabase import MockDatabase
 from db_env.DatabaseEnvironment import DatabaseEnvironment
@@ -40,6 +50,3 @@ Package with concrete database class for tpch benchmark.
 #### mock
 
 Package with example mock database for tests with stored sample data.
-
-### tests
-Tests for procject.
