@@ -9,7 +9,6 @@ class MockDatabase(Database):
     are already defined.
 
     Possible states and their benchmark results:
-    - 01/23/45
     - [0,0,0]: some float
     - [0,0,1]: some float
     - [0,1,1]: some float
@@ -36,7 +35,7 @@ class MockDatabase(Database):
 
     def execute_action(self, action: int) -> None:
         db_action = self.action_mapper[action]
-        self._state[db_action[0]][db_action[1]] = db_action[2] == 'CREATE'
+        self._state[db_action[0]][db_action[1]] = int(db_action[2] == 'CREATE')
 
     def execute_benchmark(self) -> float:
         return self._benchmark_results[hash(str(self._state))]
@@ -51,35 +50,35 @@ class MockDatabase(Database):
 
     def _mock_benchmark_results(self):
         # [0,0,0]
-        results = {hash(str(self._state)): 1000.0}
+        results = {hash(str(self._state)): 90.0}
 
         # [0,0,1]
         self.execute_action(5)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 120.0
 
         # [0,1,1]
         self.execute_action(3)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 200.0
 
         # [0,1,0]
         self.execute_action(4)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 130.0
 
         # [1,1,0]
         self.execute_action(1)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 110.0
 
         # [1,1,1]
         self.execute_action(5)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 190.0
 
         # [1,0,1]
         self.execute_action(2)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 120.0
 
         # [1,0,0]
         self.execute_action(4)
-        results[hash(str(self._state))] = 1000.0
+        results[hash(str(self._state))] = 100.0
 
         # [0,0,0]
         self.execute_action(0)
