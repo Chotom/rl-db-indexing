@@ -11,3 +11,7 @@ venv
 *.csv
 *.json
 *.xml
+*.zip
+
+# tpch
+./db_env/tpch/tpch_generator/tpch_tools/
