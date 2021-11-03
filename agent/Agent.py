@@ -1,7 +1,9 @@
 import random
+import csv
 import numpy as np
-import gym as gym
+import pandas as pd
 
+from agent.consts import AGENT_CSV_FILE
 from db_env.DatabaseEnvironment import DatabaseEnvironment
 
 class Agent:
@@ -20,37 +22,56 @@ class Agent:
                          for _ in range(self._env.action_space.n)]
         """Estimated weights of features and bias for every action."""
 
+        self.dict_info = {
+            'episode':                  int,
+            'step':                     int,
+            'state':                    int,
+            'action':                   int,
+            'reward':                   float,
+            'next_state':               int,
+            'q':                        float,
+            'max_a':                    int,
+            'max_q':                    int,
+            'total_reward':             float,
+            'exploration_probability':  float,
+            'random_action':            bool
+        }
+
     def train(self, episode_count: int, steps_per_episode: int):
+        with open(AGENT_CSV_FILE, 'w', newline='') as file:
+            wr = csv.writer(file)
+            wr.writerow(self.dict_info.keys())
+
         for episode in range(episode_count):
-            print(f'Starting episode {episode}: ')
-            print(f'Current weights: {self._weights}')
+            self.dict_info['episode'] = episode
 
             state = self._env.reset()
+            total_reward = 0.0
 
             for step in range(steps_per_episode):
-                print(f'Step {step} of episode {episode}')
-                print(f'Current weights: {self._weights}')
-                print(f'Current state:')
-                print(state)
-
                 action = self._choose_action(state)
-                print(f'Taking action:')
-                print(action)
 
                 next_state, reward, _, _ = self._env.step(action)
-                print(f'Moved to:')
-                print(next_state)
-                print(f'Reward: {reward}')
+                total_reward += reward
 
                 # choose max from q(next_state, unknown_action) over action
                 self._update_weights(state, action, reward, next_state)
 
+                # append data to csv
+                self.dict_info['step'] = step
+                self.dict_info['state'] = 1
+                self.dict_info['action'] = action
+                self.dict_info['reward'] = reward
+                self.dict_info['next_state'] = 1
+                self.dict_info['total_reward'] = total_reward
+
+                with open(AGENT_CSV_FILE, 'a', newline='') as file:
+                    wr = csv.writer(file)
+                    wr.writerow(self.dict_info.values())
+
                 state = next_state
 
             self._reduce_exploration_probability()
-
-    # f_i(s, a) = f_i(s') = if a == changes_index(i), then new_i else s_i
-    # max_q = q(s')
 
     def _update_weights(self, state, action, reward, next_state):
         state_features = self._get_features_from_state(state)
@@ -59,15 +80,15 @@ class Agent:
 
         max_action, max_q = self._get_max_action(next_state)
 
-        print(f'old weights: {self._weights}')
-
         # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
         approx_q = self._weights[action] @ features
         self._weights[action] += (self.learning_rate
                                   * (reward + self.learning_rate * max_q - approx_q)
                                   * features)
 
-        print(f'new weights: {self._weights}')
+        self.dict_info['q'] = approx_q
+        self.dict_info['max_a'] = max_action
+        self.dict_info['max_q'] = max_q
 
     def _get_max_action(self, state):
         max_q = float('-inf')
@@ -96,15 +117,22 @@ class Agent:
         features = self._get_features_from_state(state)
         possible_actions = []
         for index, is_indexed in enumerate(features):
-            possible_action = index*2 + (not is_indexed)
+            possible_action = index * 2 + (not is_indexed)
             possible_actions.append(possible_action)
 
         return possible_actions
 
     def _choose_action(self, state):
+        self.dict_info['exploration_probability'] = self.exploration_probability
+
         if random.random() < self.exploration_probability:
+            self.dict_info['random_action'] = True
+
             # return random action with probability epsilon
             return random.choice(self._possible_actions(state))
+
+        self.dict_info['random_action'] = False
+
         # return best action with probability 1-epsilon
         max_action, _ = self._get_max_action(state)
         return max_action
