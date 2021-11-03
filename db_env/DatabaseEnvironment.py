@@ -16,12 +16,12 @@ class DatabaseEnvironment(gym.Env):
         self._reward_cache: dict[int, float] = {}
 
         self.action_space = spaces.Discrete(len(db.action_mapper))
-        self.observation_space = self.__get_observation_space()
+        self.observation_space = self._get_observation_space() # todo: change to Multibinary
 
     def step(self, action):
         self._db.execute_action(action)
         return (self._db.state,  # Observation
-                self.__get_reward(),  # Reward
+                self._get_reward(),  # Reward
                 False,  # is Episode done
                 '{}')  # Additional info
 
@@ -46,8 +46,8 @@ class DatabaseEnvironment(gym.Env):
         with closing(out):
             return out.getvalue()
 
-    def __get_observation_space(self) -> spaces.Dict:
-        """:return: Created possible space fro observations (states)"""
+    def _get_observation_space(self) -> spaces.Dict:
+        """:return: Created possible space for observations (states)"""
         db_state_dict = {}
         for table_name, table in self._db.state.items():
             table_dict = {}
@@ -57,7 +57,7 @@ class DatabaseEnvironment(gym.Env):
             db_state_dict[table_name] = spaces.Dict(table_dict)
         return spaces.Dict(db_state_dict)
 
-    def __get_reward(self) -> float:
+    def _get_reward(self) -> float:
         """
         Search for saved reward in dict by current state, or execute benchmark
         to measure and save result.

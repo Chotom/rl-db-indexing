@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class Benchmark(ABC):
-    def __init__(self):
-        pass
-
     @abstractmethod
     def prepare_queries(self) -> None:
         """Render queries to be executed during benchmark."""

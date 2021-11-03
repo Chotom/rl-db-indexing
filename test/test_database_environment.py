@@ -16,6 +16,7 @@ class TestDatabaseEnvironment(unittest.TestCase):
         self.assertTrue(self.db_env.observation_space['table1']['column1'].sample() in [0, 1])
         self.assertTrue(self.db_env.observation_space['table1']['column2'].sample() in [0, 1])
         self.assertTrue(self.db_env.observation_space['table2']['column1'].sample() in [0, 1])
+        print(self.db_env.observation_space)
 
     def test_render(self):
         render = self.db_env.render()
