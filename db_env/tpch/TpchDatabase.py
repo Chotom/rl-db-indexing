@@ -33,7 +33,7 @@ class TpchDatabase(Database):
 
         db_config = {}
         try:
-            db_config['user'] = float(os.environ['USER'])
+            db_config['user'] = os.environ['USER']
             db_config['password'] = os.environ['MYSQL_ROOT_PASSWORD']
             db_config['host'] = os.environ['MYSQL_HOST']
             db_config['port'] = os.environ['MYSQL_PORT']
