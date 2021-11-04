@@ -5,8 +5,7 @@ import pandas as pd
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 
-from benchmark_cli.constants import QUERIES_DIR # todo set query dir
-
+from db_env.tpch.tpch_generator.consts import QUERIES_DIR
 from db_env.tpch.tpch_stream.Stream import Stream
 from db_env.tpch.tpch_stream.consts import QUERY_ORDER
 

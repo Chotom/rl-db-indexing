@@ -12,7 +12,7 @@ class TestAgent(unittest.TestCase):
         self.agent = Agent(self.db_env)
 
     def test_train(self):
-        self.agent.train(100, 20)
+        self.agent.train(20, 200)
 
         print(self.agent._weights)
         print(self.db_env.render())

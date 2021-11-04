@@ -1,7 +1,6 @@
 import random
 import csv
 import numpy as np
-import pandas as pd
 
 from agent.consts import AGENT_CSV_FILE
 from db_env.DatabaseEnvironment import DatabaseEnvironment
