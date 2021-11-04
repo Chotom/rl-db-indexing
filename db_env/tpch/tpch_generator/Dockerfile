@@ -1,0 +1,18 @@
+FROM ubuntu:20.04
+
+RUN true \
+    && apt-get -y update \
+    && apt-get -y install git make gcc \
+    && apt-get -y install mysql-client \
+    && apt-get -y install python3 \
+    && apt-get -y install pip \
+
+# Config python
+ENV PYTHONPATH="${PYTHONPATH}:/"
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# Install dbgen
+COPY tpch_tools /tpch_tools
+RUN python tpch_tools/tpch_tools_patch.py
+RUN make -C tpch_tools/dbgen/
