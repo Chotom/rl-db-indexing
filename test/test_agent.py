@@ -13,10 +13,7 @@ class TestAgent(unittest.TestCase):
 
     def test_train(self):
         self.agent.train(20, 200)
-
-        print(self.agent._weights)
         print(self.db_env.render())
-
 
     # def test_action_space_sample(self):
     #     self.assertTrue(0 <= self.db_env.action_space.sample() <= len(self.db.action_mapper))

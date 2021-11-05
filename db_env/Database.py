@@ -22,7 +22,7 @@ class Database(ABC):
         self._action_mapper: Final[list[tuple[str, str, str]]] = [(table_name, col_name, action_type)
                                                                   for table_name, table in self._state.items()
                                                                   for col_name in table
-                                                                  for action_type in ['DROP', 'CREATE']]
+                                                                  for action_type in ['DROP INDEX', 'CREATE INDEX']]
 
     @property
     def action_mapper(self) -> list[tuple[str, str, str]]:

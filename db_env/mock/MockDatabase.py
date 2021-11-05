@@ -35,7 +35,7 @@ class MockDatabase(Database):
 
     def execute_action(self, action: int) -> None:
         db_action = self.action_mapper[action]
-        self._state[db_action[0]][db_action[1]] = int(db_action[2] == 'CREATE')
+        self._state[db_action[0]][db_action[1]] = int(db_action[2] == 'CREATE INDEX')
 
     def execute_benchmark(self) -> float:
         return self._benchmark_results[hash(str(self._state))]
