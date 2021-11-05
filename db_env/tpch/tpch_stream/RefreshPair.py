@@ -10,7 +10,7 @@ from benchmark_cli.constants import REFRESH_DATA_DIR
 
 from db_env.tpch.tpch_stream.consts import LINEITEM_QUOTE_INDEX_LIST, ORDERS_QUOTE_INDEX_LIST
 from shared_utils.consts import VALUE_SEP
-from shared_utils.utils import create_logger
+from shared_utils.logger import create_logger
 
 
 class RefreshPair:

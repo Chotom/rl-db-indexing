@@ -4,7 +4,7 @@ import numpy as np
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 
-from shared_utils.utils import create_logger
+from shared_utils.logger import create_logger
 from db_env.tpch.TpchDatabase import TpchDatabase
 
 

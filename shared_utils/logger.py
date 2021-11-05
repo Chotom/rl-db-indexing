@@ -1,6 +1,7 @@
 import logging
 
-from shared_utils.consts import LOG_LEVEL
+LOG_LEVEL = logging.INFO
+"""Message logging level"""
 
 
 def create_logger(name: str) -> logging.Logger:

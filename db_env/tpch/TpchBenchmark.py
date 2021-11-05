@@ -11,15 +11,12 @@ from db_env.tpch.tpch_stream.QueryStream import QueryStream
 from db_env.tpch.tpch_stream.RefreshPair import RefreshPair
 from db_env.tpch.tpch_stream.RefreshStream import RefreshStream
 from db_env.tpch.tpch_stream.Stream import Stream
-from shared_utils.utils import create_logger
+from shared_utils.logger import create_logger
 
 
 class TpchBenchmark(Benchmark):
-    _dotenv_path = './.env'
-
     def __init__(self):
         self._log = create_logger('tpch_benchmark')
-        dotenv.load_dotenv(self._dotenv_path)
         self._load_env()
         self._generate_data()
 
@@ -33,7 +30,7 @@ class TpchBenchmark(Benchmark):
         throughput_size = self._run_throughput_test()
         self._inc_refresh_file_index(self._stream_count)
 
-        # todo: save .env file (start_seed, rf_index_file)
+        # todo: save db.env file (start_seed, rf_index_file)
 
         return (power_size * throughput_size) ** (1 / 2)
 
@@ -48,22 +45,22 @@ class TpchBenchmark(Benchmark):
         try:
             self._stream_count = os.environ['STREAM_COUNT']
         except KeyError as e:
-            self._log.error(f'STREAM_COUNT not found in .env file: {e}')
+            self._log.error(f'STREAM_COUNT not found in db.env file: {e}')
 
         try:
             self._refresh_file_index = os.environ['RF_FILE_ID']
         except KeyError as e:
-            self._log.error(f'RF_FILE_ID not found in .env file: {e}')
+            self._log.error(f'RF_FILE_ID not found in db.env file: {e}')
 
         try:
             self._max_rf_file_id = os.environ['MAX_RF_FILE_ID']
         except KeyError as e:
-            self._log.error(f'MAX_RF_FILE_ID not found in .env file: {e}')
+            self._log.error(f'MAX_RF_FILE_ID not found in db.env file: {e}')
 
         try:
             self._scale_factor = float(os.environ['SCALE_FACTOR'])
         except KeyError as e:
-            self._log.error(f'SCALE_FACTOR not found in .env file: {e}')
+            self._log.error(f'SCALE_FACTOR not found in db.env file: {e}')
 
     def _run_power_test(self) -> float:
         """

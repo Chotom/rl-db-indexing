@@ -3,14 +3,13 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from mysql.connector import MySQLConnection
 
 from db_env.tpch.tpch_generator.consts import *
 from db_env.tpch.tpch_generator.utils import get_connection
-from shared_utils.utils import create_logger
+from shared_utils.logger import create_logger
 
 
-class TPCHGenerator:
+class TpchGenerator:
     """
     A class for generating, loading, resetting data for database
     """
@@ -148,3 +147,11 @@ class TPCHGenerator:
                                    cwd=DBGEN_DIR,
                                    env=dict(os.environ, DSS_QUERY=f'{DBGEN_DIR}/queries'),
                                    stdout=output_file)
+
+
+if __name__ == '__main__':
+    generator = TpchGenerator()
+    generator.reset_db()
+    generator.generate_data()
+    generator.load_db()
+    generator.generate_refresh_data()

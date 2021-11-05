@@ -3,7 +3,6 @@ from pathlib import Path
 import zipfile
 
 DIR_NAME = 'TPC-H_Tools_v3.0.0'
-PATCH_DIR_NAME = 'dbgen_mysql_patch'
 
 
 def tpch_tools_patch():
@@ -20,7 +19,7 @@ def tpch_tools_patch():
 def _extract_tpch_tools(zip_ref: zipfile.ZipFile):
     for name in zip_ref.namelist():
         if name.startswith(DIR_NAME):
-            zip_ref.extract(name, './')
+            zip_ref.extract(name, '/')
 
 
 def _move_tpch_tools():
@@ -32,7 +31,7 @@ def _move_tpch_tools():
 
 def _patch():
     shutil.rmtree(f'./dbgen/queries')
-    for src_file in Path(f'./{PATCH_DIR_NAME}/').glob('*'):
+    for src_file in Path(f'dbgen_mysql_patch/').glob('*'):
         try:
             shutil.copytree(src_file, f'./dbgen/{src_file.name}')
         except NotADirectoryError:

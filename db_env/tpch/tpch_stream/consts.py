@@ -1,3 +1,9 @@
+max_refresh_file_index = 4000
+"""Max refresh file index from tpc-h documentation"""
+
+VALUE_SEP = ','
+"""Data values separator"""
+
 ORDERS_QUOTE_INDEX_LIST = [2, 4, 5, 6, 8]
 """Order table values order:\n
 [0] o_orderkey      INTEGER        NOT NULL,\n
