@@ -6,11 +6,9 @@ import pandas as pd
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursorBuffered
 
-from benchmark_cli.constants import REFRESH_DATA_DIR
-
-from db_env.tpch.tpch_stream.consts import LINEITEM_QUOTE_INDEX_LIST, ORDERS_QUOTE_INDEX_LIST
-from shared_utils.consts import VALUE_SEP
-from shared_utils.logger import create_logger
+from db_env.tpch.config import DB_REFRESH_DIR
+from db_env.tpch.tpch_stream.consts import LINEITEM_QUOTE_INDEX_LIST, ORDERS_QUOTE_INDEX_LIST, VALUE_SEP
+from shared_utils.utils import create_logger
 
 
 class RefreshPair:
@@ -32,8 +30,8 @@ class RefreshPair:
         insert_queries = []
 
         # Load insert queries from files
-        with open(f'{REFRESH_DATA_DIR}/orders.tbl.u{self.__run_number}', 'r') as orders_file, \
-                open(f'{REFRESH_DATA_DIR}/lineitem.tbl.u{self.__run_number}', 'r') as lineitem_file:
+        with open(f'{DB_REFRESH_DIR}/orders.tbl.u{self.__run_number}', 'r') as orders_file, \
+                open(f'{DB_REFRESH_DIR}/lineitem.tbl.u{self.__run_number}', 'r') as lineitem_file:
             try:
                 # read first lineitem query
                 lineitem_row = next(lineitem_file)
@@ -58,7 +56,7 @@ class RefreshPair:
         self.__insert_queries_iter = iter(insert_queries)
 
         # load delete queries
-        with open(f'{REFRESH_DATA_DIR}/delete.{self.__run_number}', 'r') as deletes_file:
+        with open(f'{DB_REFRESH_DIR}/delete.{self.__run_number}', 'r') as deletes_file:
             delete_queries = deletes_file.readlines()
 
             for i, delete_row in enumerate(delete_queries):
@@ -133,7 +131,7 @@ class RefreshPair:
         """:return: dataframe with measured queries and total_time of execution"""
         return self._df_measures.set_index('name')
 
-    def _data_row_to_query(self, row: str, table_name: str, quoted_values_indexes: List[int]) -> (int, str):
+    def _data_row_to_query(self, row: str, table_name: str, quoted_values_indexes: list[int]) -> (int, str):
         """
         Convert string data into mysql insert query.
 

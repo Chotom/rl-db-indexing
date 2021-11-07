@@ -1,6 +1,3 @@
-max_refresh_file_index = 4000
-"""Max refresh file index from tpc-h documentation"""
-
 VALUE_SEP = ','
 """Data values separator"""
 

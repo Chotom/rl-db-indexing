@@ -1,23 +1,19 @@
-import os
+import numpy as np
 from threading import Thread
 
-import dotenv
-import pandas as pd
-import numpy as np
-
 from db_env.Benchmark import Benchmark
-from db_env.tpch.TpchDatabase import TpchDatabase
+from db_env.tpch.config import MAX_REFRESH_FILE_INDEX, STREAM_COUNT, SCALE_FACTOR, DB_REFRESH_ID
 from db_env.tpch.tpch_stream.QueryStream import QueryStream
 from db_env.tpch.tpch_stream.RefreshPair import RefreshPair
 from db_env.tpch.tpch_stream.RefreshStream import RefreshStream
 from db_env.tpch.tpch_stream.Stream import Stream
-from shared_utils.logger import create_logger
+from shared_utils.utils import create_logger, get_connection
 
 
 class TpchBenchmark(Benchmark):
     def __init__(self):
         self._log = create_logger('tpch_benchmark')
-        self._load_env()
+        self._load_rf_id()
         self._generate_data()
 
     def prepare_queries(self) -> None:
@@ -28,39 +24,27 @@ class TpchBenchmark(Benchmark):
         self._inc_refresh_file_index()
 
         throughput_size = self._run_throughput_test()
-        self._inc_refresh_file_index(self._stream_count)
+        self._inc_refresh_file_index(STREAM_COUNT)
 
-        # todo: save db.env file (start_seed, rf_index_file)
+        self._save_rf_id()
 
         return (power_size * throughput_size) ** (1 / 2)
 
     def _inc_refresh_file_index(self, number: int = 1):
-        self._refresh_file_index = (self._refresh_file_index + number) % self._max_rf_file_id
+        self._refresh_file_index = (self._refresh_file_index + number) % MAX_REFRESH_FILE_INDEX
+
+    def _load_rf_id(self):
+        with open(DB_REFRESH_ID, 'r') as f:
+            for line in f:
+                self._refresh_file_index = int(line)
+
+    def _save_rf_id(self):
+        with open(DB_REFRESH_ID, 'w') as f:
+            f.write(self._refresh_file_index)
 
     def _generate_data(self) -> None:
         # todo: Add data generating here
         pass
-
-    def _load_env(self):
-        try:
-            self._stream_count = os.environ['STREAM_COUNT']
-        except KeyError as e:
-            self._log.error(f'STREAM_COUNT not found in db.env file: {e}')
-
-        try:
-            self._refresh_file_index = os.environ['RF_FILE_ID']
-        except KeyError as e:
-            self._log.error(f'RF_FILE_ID not found in db.env file: {e}')
-
-        try:
-            self._max_rf_file_id = os.environ['MAX_RF_FILE_ID']
-        except KeyError as e:
-            self._log.error(f'MAX_RF_FILE_ID not found in db.env file: {e}')
-
-        try:
-            self._scale_factor = float(os.environ['SCALE_FACTOR'])
-        except KeyError as e:
-            self._log.error(f'SCALE_FACTOR not found in db.env file: {e}')
 
     def _run_power_test(self) -> float:
         """
@@ -74,7 +58,7 @@ class TpchBenchmark(Benchmark):
         return self._execute_power_test(refresh_pair, query_stream)
 
     def _prepare_power_test(self) -> (RefreshPair, QueryStream):
-        connection, cursor = TpchDatabase.get_connection(self._log, True)
+        connection, cursor = get_connection(self._log, True)
         refresh_pair = RefreshPair('refresh_pair_powertest', self._refresh_file_index, connection, cursor)
         query_stream = QueryStream('query_stream_powertest', 0, connection, cursor)
         refresh_pair.load_data()
@@ -92,7 +76,7 @@ class TpchBenchmark(Benchmark):
     def _calculate_power_test_result(self, refresh_pair: RefreshPair, query_stream: QueryStream) -> float:
         power_test_results = query_stream.df_measures.append(refresh_pair.df_measures)
         geometric_mean = np.prod(power_test_results['time'].apply(lambda x: x.total_seconds())) ** (1 / 24)
-        power_size = 3600 * self._scale_factor / geometric_mean
+        power_size = 3600 * SCALE_FACTOR / geometric_mean
 
         return power_size
 
@@ -109,8 +93,8 @@ class TpchBenchmark(Benchmark):
 
     def _prepare_throughput_test(self) -> (list[Stream], list[Thread]):
         processes = []
-        streams = [RefreshStream('refresh_stream', self._stream_count, self._refresh_file_index)]
-        for i in range(self._stream_count):
+        streams = [RefreshStream('refresh_stream', STREAM_COUNT, self._refresh_file_index)]
+        for i in range(STREAM_COUNT):
             streams.append(QueryStream(f'query_stream_{i + 1}', i + 1))
 
         for stream in streams:
@@ -132,6 +116,6 @@ class TpchBenchmark(Benchmark):
 
     def _calculate_throughput_test_result(self, streams: list[Stream]):
         total_time = max(stream.df_measures['time'].sum() for stream in streams)
-        throughput_size = (len(streams) - 1) * 22 * 3600 * self._scale_factor / total_time.total_seconds()
+        throughput_size = (len(streams) - 1) * 22 * 3600 * SCALE_FACTOR / total_time.total_seconds()
 
         return throughput_size

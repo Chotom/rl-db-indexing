@@ -1,8 +1,12 @@
+import os
 import shutil
 from pathlib import Path
 import zipfile
 
+from db_env.tpch.config import DB_GENERATOR_TOOL
+
 DIR_NAME = 'TPC-H_Tools_v3.0.0'
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def tpch_tools_patch():
@@ -10,7 +14,6 @@ def tpch_tools_patch():
         with zipfile.ZipFile('tpc-h-tool.zip', 'r') as zip_ref:
             _extract_tpch_tools(zip_ref)
             _move_tpch_tools()
-            _patch()
     except FileNotFoundError as e:
         print(f'Error: file not found: {e}')
     return
@@ -19,23 +22,26 @@ def tpch_tools_patch():
 def _extract_tpch_tools(zip_ref: zipfile.ZipFile):
     for name in zip_ref.namelist():
         if name.startswith(DIR_NAME):
-            zip_ref.extract(name, '/')
+            zip_ref.extract(name, '.')
 
 
 def _move_tpch_tools():
-    shutil.rmtree(f'./dbgen')
-    for src_file in Path(f'./{DIR_NAME}/').glob('dbgen'):
-        shutil.move(src_file, f'./{src_file.name}')
-    shutil.rmtree(f'./{DIR_NAME}')
+    dbgen_dir = DB_GENERATOR_TOOL
+
+    for src_file in Path(f'{DIR_NAME}/').glob('dbgen'):
+        shutil.move(src_file, f'{dbgen_dir}')
+    shutil.rmtree(f'{DIR_NAME}')
+
+    _patch(dbgen_dir)
 
 
-def _patch():
-    shutil.rmtree(f'./dbgen/queries')
+def _patch(dbgen_dir):
+    shutil.rmtree(f'{dbgen_dir}/queries')
     for src_file in Path(f'dbgen_mysql_patch/').glob('*'):
         try:
-            shutil.copytree(src_file, f'./dbgen/{src_file.name}')
+            shutil.copytree(src_file, f'{dbgen_dir}/{src_file.name}')
         except NotADirectoryError:
-            shutil.copy(src_file, f'./dbgen/{src_file.name}')
+            shutil.copy(src_file, f'{dbgen_dir}/{src_file.name}')
 
 
 if __name__ == '__main__':

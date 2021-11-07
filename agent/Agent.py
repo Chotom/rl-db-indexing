@@ -3,6 +3,10 @@ import csv
 import numpy as np
 
 from db_env.DatabaseEnvironment import DatabaseEnvironment
+from shared_utils.consts import PROJECT_DIR
+
+AGENT_CSV_FILE = f'{PROJECT_DIR}/data/agent_history.csv'
+WEIGHTS_FILE = f'{PROJECT_DIR}/data//data/weights.dat'
 
 
 class Agent:

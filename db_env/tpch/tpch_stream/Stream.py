@@ -4,8 +4,7 @@ import numpy as np
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 
-from shared_utils.logger import create_logger
-from db_env.tpch.TpchDatabase import TpchDatabase
+from shared_utils.utils import create_logger, get_connection
 
 
 class Stream(ABC):
@@ -39,7 +38,7 @@ class Stream(ABC):
         if conn is not None and cursor is not None:
             self._connection, self._cursor = conn, cursor
         elif conn is None and cursor is None:
-            self._connection, self._cursor = TpchDatabase.get_connection(self._log, is_buffered)
+            self._connection, self._cursor = get_connection(self._log, is_buffered)
         else:
             self._log.error('Database connection or cursor is not defined. Error creating stream object: missing arg.')
             raise

@@ -13,4 +13,12 @@ services:
     ports:
       - '3306:3306'
     env_file:
-      - ./db_env/tpch/.env
+      - db.env
+
+  client:
+    build: .
+    tty: true
+    env_file:
+      - db.env
+    volumes:
+      - ./db_env:/project/db_env
