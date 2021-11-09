@@ -21,7 +21,7 @@ class TpchGenerator:
 
     def generate_data(self):
         """Generate database input"""
-        self._log.info('Generating data with dbgen...')
+        self._log.info(f'Generating data with dbgen in {DB_GENERATOR_TOOL}/dbgen dir')
 
         # call dbgen with scale factor
         subprocess.run([f'{DB_GENERATOR_TOOL}/dbgen', '-vf', '-s', f'{SCALE_FACTOR}'],

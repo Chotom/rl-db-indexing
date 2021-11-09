@@ -11,7 +11,7 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def tpch_tools_patch():
     try:
-        with zipfile.ZipFile('tpc-h-tool.zip', 'r') as zip_ref:
+        with zipfile.ZipFile(f'{parent_dir}/tpch_tools/tpc-h-tool.zip', 'r') as zip_ref:
             _extract_tpch_tools(zip_ref)
             _move_tpch_tools()
     except FileNotFoundError as e:
@@ -37,7 +37,7 @@ def _move_tpch_tools():
 
 def _patch(dbgen_dir):
     shutil.rmtree(f'{dbgen_dir}/queries')
-    for src_file in Path(f'dbgen_mysql_patch/').glob('*'):
+    for src_file in Path(f'{parent_dir}/tpch_tools/dbgen_mysql_patch/').glob('*'):
         try:
             shutil.copytree(src_file, f'{dbgen_dir}/{src_file.name}')
         except NotADirectoryError:

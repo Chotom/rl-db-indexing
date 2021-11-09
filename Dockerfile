@@ -14,4 +14,5 @@ RUN pip install -r requirements.txt
 
 # Install dbgen
 COPY . /project
+RUN python3 /project/db_env/tpch/tpch_tools/tpch_tools_patch.py
 RUN make -C /project/dbgen

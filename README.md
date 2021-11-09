@@ -1,52 +1,70 @@
 # rl-db-indexing
 
-[![License](https://img.shields.io/github/license/Chotom/rl-db-indexing)](https://github.com/Chotom/rl-db-indexing/blob/main/LICENSE)
-
 Database indexes tuning with agent using reinforcement learning techniques
+
+[![License](https://img.shields.io/github/license/Chotom/rl-db-indexing)](https://github.com/Chotom/rl-db-indexing/blob/main/LICENSE)
 
 ## Setup
 
-Create venv and install packages with:
+How to train an agent and set up an environment for TPC-H database with Docker.
 
-```shell
-pip install -r requirements.txt
+### Prepare tpch database
+
+1. In '*./db_env/tpch/tpch_tools*'  paste tpc-h-tool.zip downloaded from tpc website (version
+   3.0.0): [download link](http://tpc.org/tpc_documents_current_versions/download_programs/tools-download-request5.asp?bm_type=TPC-H&bm_vers=3.0.0&mode=CURRENT-ONLY "tpch tools")
+
+
+2. Define tpch database size (in GB) in *./db_env/tpch/config.py*
+
+```python
+SCALE_FACTOR = 0.1  # Preferred 1 or 0.1 for local usage
 ```
 
-## Tests
-Tests are store in _./test_ directory.
-Run tests for with code coverage:
+3. Start mysql server and client
 
 ```shell
-coverage run -m unittest
-coverage report
+docker-compose up -d
 ```
+
+4. Generate data and load database to mysql_server in container
+
+```shell
+docker-compose exec client python3 /project/db_env/tpch/TpchGenerator.py
+```
+
+---
+
+### Prepare benchmark
+
+---
+
+### Train agent
+
+---
 
 ## Project structure
+
+### data
+
+Directory to store project datafiles and data analysis.
+
+### agent
+
+Package with agent to train
 
 ### db_env
 
 Package with database environment for agent.
 
-_DatabaseEnvironment.py_
+### shared_utils
 
-```python
-from db_env.mock.MockDatabase import MockDatabase
-from db_env.DatabaseEnvironment import DatabaseEnvironment
+Package with utilities functions and variables to use in project.
 
-# Example usage
-db = MockDatabase()
-db_env = DatabaseEnvironment(db)
+### test
 
-# Methods
-db_env.step(db_env.action_space.sample())
-db_env.render()
-db_env.reset()
+Run tests with code coverage:
+
+```shell
+coverage run -m unittest
+coverage report
 ```
-
-#### tpch
-
-Package with concrete database class for tpch benchmark.
-
-#### mock
-
-Package with example mock database for tests with stored sample data.
