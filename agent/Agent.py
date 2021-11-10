@@ -1,19 +1,20 @@
 import random
 import csv
 import numpy as np
+import pandas as pd
 
 from db_env.DatabaseEnvironment import DatabaseEnvironment
 from shared_utils.consts import PROJECT_DIR
 
 AGENT_CSV_FILE = f'{PROJECT_DIR}/data/agent_history.csv'
-WEIGHTS_FILE = f'{PROJECT_DIR}/data//data/weights.dat'
+WEIGHTS_FILE = f'{PROJECT_DIR}//data/weights.dat'
 
 
 class Agent:
     def __init__(self, env: DatabaseEnvironment):
         self._env = env
         self.exploration_probability = 0.9
-        self.learning_rate = 0.01
+        self.learning_rate = 0.1
         self.discount_factor = 0.8
         self._weights = [np.zeros(self._env.observation_space.n + 1)
                          for _ in range(self._env.action_space.n)]
@@ -54,6 +55,7 @@ class Agent:
                 state = next_state
 
             self._reduce_exploration_probability()
+        pd.DataFrame(self._weights).to_csv(WEIGHTS_FILE, index=False)
 
     def _update_weights(self, state, action, reward, next_state):
         biased_features = np.array([1] + state)
@@ -61,8 +63,7 @@ class Agent:
 
         # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
         approx_q = self._weights[action] @ biased_features
-        self._weights[action] += (self.learning_rate
-                                  * (reward + self.learning_rate * max_q - approx_q)
+        self._weights[action] += (self.learning_rate * (reward + self.discount_factor * max_q - approx_q)
                                   * biased_features)
 
         self.dict_info['q'] = approx_q
