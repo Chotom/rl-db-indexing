@@ -7,7 +7,7 @@ from db_env.DatabaseEnvironment import DatabaseEnvironment
 from shared_utils.consts import PROJECT_DIR
 
 AGENT_CSV_FILE = f'{PROJECT_DIR}/data/agent_history.csv'
-WEIGHTS_FILE = f'{PROJECT_DIR}//data/weights.dat'
+WEIGHTS_FILE = f'{PROJECT_DIR}//data/weights.csv'
 
 
 class Agent:
@@ -29,7 +29,9 @@ class Agent:
             'next_state':               list[bool],
             'q':                        float,
             'max_a':                    int,
-            'max_q':                    int,
+            'max_q':                    float,
+            'td_target':                float,
+            'td_error':                 float,
             'total_reward':             float,
             'exploration_probability':  float,
             'random_action':            bool
@@ -61,14 +63,18 @@ class Agent:
         biased_features = np.array([1] + state)
         max_action, max_q = self._get_max_action(next_state)
 
-        # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
         approx_q = self._weights[action] @ biased_features
-        self._weights[action] += (self.learning_rate * (reward + self.discount_factor * max_q - approx_q)
-                                  * biased_features)
+        td_target = reward + self.discount_factor * max_q
+        td_error = td_target - approx_q
+
+        # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
+        self._weights[action] += self.learning_rate * td_error * biased_features
 
         self.dict_info['q'] = approx_q
         self.dict_info['max_a'] = max_action
         self.dict_info['max_q'] = max_q
+        self.dict_info['td_target'] = td_target
+        self.dict_info['td_error'] = td_error
 
     def _get_max_action(self, state):
         max_q = float('-inf')
