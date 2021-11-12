@@ -1,3 +1,5 @@
+from typing import List
+
 import gym as gym
 from contextlib import closing
 from io import StringIO
@@ -46,7 +48,7 @@ class DatabaseEnvironment(gym.Env):
         """:return: Action meanings in array where index is number of action"""
         return self._db.action_mapper
 
-    def _get_observation(self) -> list[bool]:
+    def _get_observation(self) -> List[bool]:
         """:return: Map database state to environment observation"""
         observation: list[bool] = []
         for table in self._db.state.values():

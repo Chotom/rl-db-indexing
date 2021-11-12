@@ -1,5 +1,5 @@
 import datetime
-from typing import Iterator
+from typing import Iterator, Tuple, List
 
 import numpy as np
 import pandas as pd
@@ -131,7 +131,7 @@ class RefreshPair:
         """:return: dataframe with measured queries and total_time of execution"""
         return self._df_measures.set_index('name')
 
-    def _data_row_to_query(self, row: str, table_name: str, quoted_values_indexes: list[int]) -> (int, str):
+    def _data_row_to_query(self, row: str, table_name: str, quoted_values_indexes: List[int]) -> Tuple[int, str]:
         """
         Convert string data into mysql insert query.
 

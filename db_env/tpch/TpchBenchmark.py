@@ -1,7 +1,11 @@
+from datetime import datetime
+from typing import Tuple, List
+
 import numpy as np
 from threading import Thread
 
 from db_env.Benchmark import Benchmark
+from db_env.tpch.TpchGenerator import TpchGenerator
 from db_env.tpch.config import MAX_REFRESH_FILE_INDEX, STREAM_COUNT, SCALE_FACTOR, DB_REFRESH_ID
 from db_env.tpch.tpch_stream.QueryStream import QueryStream
 from db_env.tpch.tpch_stream.RefreshPair import RefreshPair
@@ -17,7 +21,10 @@ class TpchBenchmark(Benchmark):
         self._generate_data()
 
     def prepare_queries(self) -> None:
-        pass
+        generator = TpchGenerator()
+        # mmddhhmmss
+        seed = int(datetime.now().strftime("%m%d%H%M%S"))
+        generator.generate_queries(seed, STREAM_COUNT + 1)
 
     def execute(self) -> float:
         power_size = self._run_power_test()
@@ -40,7 +47,7 @@ class TpchBenchmark(Benchmark):
 
     def _save_rf_id(self):
         with open(DB_REFRESH_ID, 'w') as f:
-            f.write(self._refresh_file_index)
+            f.write(str(self._refresh_file_index))
 
     def _generate_data(self) -> None:
         # todo: Add data generating here
@@ -57,7 +64,7 @@ class TpchBenchmark(Benchmark):
         refresh_pair, query_stream = self._prepare_power_test()
         return self._execute_power_test(refresh_pair, query_stream)
 
-    def _prepare_power_test(self) -> (RefreshPair, QueryStream):
+    def _prepare_power_test(self) -> Tuple[RefreshPair, QueryStream]:
         connection, cursor = get_connection(self._log, True)
         refresh_pair = RefreshPair('refresh_pair_powertest', self._refresh_file_index, connection, cursor)
         query_stream = QueryStream('query_stream_powertest', 0, connection, cursor)
@@ -91,7 +98,7 @@ class TpchBenchmark(Benchmark):
         streams, processes = self._prepare_throughput_test()
         return self._execute_throughput_test(streams, processes)
 
-    def _prepare_throughput_test(self) -> (list[Stream], list[Thread]):
+    def _prepare_throughput_test(self) -> Tuple[List[Stream], List[Thread]]:
         processes = []
         streams = [RefreshStream('refresh_stream', STREAM_COUNT, self._refresh_file_index)]
         for i in range(STREAM_COUNT):
@@ -103,7 +110,7 @@ class TpchBenchmark(Benchmark):
 
         return streams, processes
 
-    def _execute_throughput_test(self, streams: list[Stream], processes: list[Thread]) -> float:
+    def _execute_throughput_test(self, streams: List[Stream], processes: List[Thread]) -> float:
         # Execute streams in parallel threads
         for execute_stream_process in processes:
             execute_stream_process.start()
@@ -114,7 +121,7 @@ class TpchBenchmark(Benchmark):
 
         return self._calculate_throughput_test_result(streams)
 
-    def _calculate_throughput_test_result(self, streams: list[Stream]):
+    def _calculate_throughput_test_result(self, streams: List[Stream]):
         total_time = max(stream.df_measures['time'].sum() for stream in streams)
         throughput_size = (len(streams) - 1) * 22 * 3600 * SCALE_FACTOR / total_time.total_seconds()
 

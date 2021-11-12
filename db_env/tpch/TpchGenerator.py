@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 from db_env.tpch.config import MAX_REFRESH_FILE_INDEX, DB_GENERATOR_TOOL, DB_DATA_DIR, SCALE_FACTOR, DB_REFRESH_DIR, \
-    DB_QUERIES_DIR
+    DB_QUERIES_DIR, DB_REFRESH_ID
 from shared_utils.consts import DB_NAME
 from shared_utils.utils import get_connection
 from shared_utils.utils import create_logger
@@ -55,6 +55,11 @@ class TpchGenerator:
             raise
 
         connection.close()
+
+        # Save information that there was no refresh_pair executed on current database
+        with open(DB_REFRESH_ID, 'w') as f:
+            f.write("1")
+
         self._log.info("Database reset successfully")
 
     def load_db(self):
@@ -123,7 +128,7 @@ class TpchGenerator:
         Path(DB_REFRESH_DIR).mkdir(parents=True, exist_ok=True)
 
         # move generated updates to refresh data folder
-        for file in [f for f_ in [glob.glob(f'{DB_GENERATOR_TOOL}/{type}') for _ in ('*.tbl.u*', 'delete.*')] for f in
+        for file in [f for f_ in [glob.glob(f'{DB_GENERATOR_TOOL}/{file_type}') for file_type in ('*.tbl.u*', 'delete.*')] for f in
                      f_]:
             shutil.move(file, f'{DB_REFRESH_DIR}/{os.path.basename(file)}')
 

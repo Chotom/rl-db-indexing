@@ -1,17 +1,21 @@
 import random
 import csv
+from typing import List
+
 import numpy as np
 import pandas as pd
 
 from db_env.DatabaseEnvironment import DatabaseEnvironment
 from shared_utils.consts import PROJECT_DIR
+from shared_utils.utils import create_logger
 
 AGENT_CSV_FILE = f'{PROJECT_DIR}/data/agent_history.csv'
-WEIGHTS_FILE = f'{PROJECT_DIR}//data/weights.csv'
+WEIGHTS_FILE = f'{PROJECT_DIR}/data/weights.csv'
 
 
 class Agent:
     def __init__(self, env: DatabaseEnvironment):
+        self._log = create_logger('agent')
         self._env = env
         self.exploration_probability = 0.9
         self.learning_rate = 0.1
@@ -23,10 +27,10 @@ class Agent:
         self.dict_info = {
             'episode':                  int,
             'step':                     int,
-            'state':                    list[bool],
+            'state':                    List[bool],
             'action':                   int,
             'reward':                   float,
-            'next_state':               list[bool],
+            'next_state':               List[bool],
             'q':                        float,
             'max_a':                    int,
             'max_q':                    float,
@@ -47,17 +51,20 @@ class Agent:
             total_reward = 0.0
 
             for step in range(steps_per_episode):
+                self._log.info(f'EPISODE {episode + 1} - STEP {step + 1} '
+                               f'({(episode_count - episode) * steps_per_episode - step - 1} more steps to go)')
+
                 action = self._choose_action(state)
                 next_state, reward, _, _ = self._env.step(action)
                 total_reward += reward
 
                 self._update_weights(state, action, reward, next_state)
-                self._save_agent_information(step, episode, state, next_state, action, reward, total_reward)
+                self._save_agent_information(episode, step, state, next_state, action, reward, total_reward)
+                self._save_agent_weights()
 
                 state = next_state
 
             self._reduce_exploration_probability()
-        pd.DataFrame(self._weights).to_csv(WEIGHTS_FILE, index=False)
 
     def _update_weights(self, state, action, reward, next_state):
         biased_features = np.array([1] + state)
@@ -91,7 +98,7 @@ class Agent:
         """:return cartesian product of feature weights and state features with bias"""
         return self._weights[action] @ np.array([1] + state)
 
-    def _possible_actions(self, state) -> list[int]:
+    def _possible_actions(self, state) -> List[int]:
         return [i * 2 + (not is_indexed) for i, is_indexed in enumerate(state)]
 
     def _choose_action(self, state):
@@ -125,3 +132,6 @@ class Agent:
         with open(AGENT_CSV_FILE, 'a', newline='') as file:
             wr = csv.writer(file)
             wr.writerow(self.dict_info.values())
+
+    def _save_agent_weights(self):
+        pd.DataFrame(self._weights).to_csv(WEIGHTS_FILE, index=False)
