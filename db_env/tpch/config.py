@@ -1,6 +1,6 @@
 from shared_utils.consts import PROJECT_DIR
 
-SCALE_FACTOR = 0.1
+SCALE_FACTOR = 1
 """Database size in GB"""
 
 STREAM_COUNT = 2

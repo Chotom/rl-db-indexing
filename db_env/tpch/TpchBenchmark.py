@@ -18,7 +18,6 @@ class TpchBenchmark(Benchmark):
     def __init__(self):
         self._log = create_logger('tpch_benchmark')
         self._load_rf_id()
-        self._generate_data()
 
     def prepare_queries(self) -> None:
         generator = TpchGenerator()
@@ -27,6 +26,8 @@ class TpchBenchmark(Benchmark):
         generator.generate_queries(seed, STREAM_COUNT + 1)
 
     def execute(self) -> float:
+        self.prepare_queries()
+
         power_size = self._run_power_test()
         self._inc_refresh_file_index()
 
@@ -48,10 +49,6 @@ class TpchBenchmark(Benchmark):
     def _save_rf_id(self):
         with open(DB_REFRESH_ID, 'w') as f:
             f.write(str(self._refresh_file_index))
-
-    def _generate_data(self) -> None:
-        # todo: Add data generating here
-        pass
 
     def _run_power_test(self) -> float:
         """

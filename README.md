@@ -31,14 +31,109 @@ docker-compose up -d
 ```shell
 docker-compose exec client python3 /project/db_env/tpch/TpchGenerator.py
 ```
+---
+
+### Prepare server (without docker)
+
+Install mysql server (version 8)
+
+Make sure root has access to
+
+
 
 ---
 
-### Prepare benchmark
+### Prepare client (without docker)
+
+Install mysql client (version 8), gcc, make, python3 (minimal version 3.8)
+
+```shell
+apt install mysql
+```
+
+Install virtualenv python package
+
+```shell
+pip install virtualenv
+```
+Move project to desired folder
+
+Create virtual environment (for example inside project directory)
+
+```shell
+virtualenv venv
+```
+
+Activate virtual environment
+
+```shell
+source venv/bin/activate
+```
+
+Make sure python version is at least 3.8
+
+```shell
+python --version
+```
+
+Install python requirements (inside project folder)
+
+```shell
+pip install -r requirements.txt
+```
+
+Set $PYTHONPATH to project path
+
+```shell
+export PYTHONPATH="${PYTHONPATH}:/path/to/project/"
+```
+
+Patch dbgen
+
+```shell
+python cli/patch_dbgen.py
+```
+
+Compile dbgen
+```shell
+make -C /path/to/project/dbgen
+```
+
+Initiate environment - populate database with generated data (this will also generate 4000 refresh function datasets for benchmarking)
+```shell
+python cli/initiate_environment.py
+```
+
+You can train agent now
+```shell
+python cli/train_agent.py
+```
+
+In case you want to run single benchmark on current database configuration
+```shell
+python cli/run_benchmark.py
+```
+
+Or if you want to reset database (without generating data for benchmark again)
+```shell
+python cli/run_benchmark.py
+```
 
 ---
 
-### Train agent
+## Important!
+
+You should not interfere with file
+
+path/to/project/data/rf_db_index.txt
+
+Keep in mind that every executed refresh pair should increment number stored in file
+
+path/to/project/data/rf_db_index.txt
+
+After refresh pair number 4000 database should be in its initial state (Note that this still hasn't been tested) - rf_db_index.txt should contain 1.
+
+Otherwise, you will lose information about current database state, which may (and sooner or later will) lead to errors and force you to stop training and reset database.
 
 ---
 

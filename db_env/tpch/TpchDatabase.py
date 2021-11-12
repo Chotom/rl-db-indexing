@@ -32,7 +32,6 @@ class TpchDatabase(Database):
         connection.close()
 
     def execute_benchmark(self) -> float:
-        self._benchmark.prepare_queries()
         return self._benchmark.execute()
 
     def reset_indexes(self) -> None:
