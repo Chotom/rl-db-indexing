@@ -18,7 +18,7 @@ class Agent:
         self._log = create_logger('agent')
         self._env = env
         self.exploration_probability = 0.9
-        self.learning_rate = 0.1
+        self.learning_rate = 0.15
         self.discount_factor = 0.8
         self._weights = [np.zeros(self._env.observation_space.n + 1)
                          for _ in range(self._env.action_space.n)]

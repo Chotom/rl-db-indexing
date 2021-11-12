@@ -1,11 +1,14 @@
-from typing import List
-
 import gym as gym
+import pandas as pd
+from gym import spaces
 from contextlib import closing
 from io import StringIO
-from gym import spaces
+from typing import List
 
 from db_env.Database import Database
+from shared_utils.consts import PROJECT_DIR
+
+REWARDS_FILE = f'{PROJECT_DIR}/data/reward_cache.csv'
 
 
 class DatabaseEnvironment(gym.Env):
@@ -64,9 +67,11 @@ class DatabaseEnvironment(gym.Env):
         :return: Measured or saved result from benchmark
         """
 
-        if (key := str(self._get_observation())) in self._reward_cache.keys():
+        key = str(self._get_observation())
+        if key in self._reward_cache.keys():
             return self._reward_cache[key]
         else:
             reward = self._db.execute_benchmark()
             self._reward_cache[key] = reward
+            pd.DataFrame.from_dict(self._reward_cache, orient='index').to_csv(REWARDS_FILE)
             return reward
