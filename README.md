@@ -64,6 +64,12 @@ Create virtual environment (for example inside project directory)
 virtualenv venv
 ```
 
+Save project path to $PYTHONPATH
+
+```shell
+echo 'export PYTHONPATH="${PYTHONPATH}:/path/to/project/"' >> venv/bin/activate
+```
+
 Activate virtual environment
 
 ```shell
@@ -82,12 +88,6 @@ Install python requirements (inside project folder)
 pip install -r requirements.txt
 ```
 
-Set $PYTHONPATH to project path
-
-```shell
-export PYTHONPATH="${PYTHONPATH}:/path/to/project/"
-```
-
 Patch dbgen
 
 ```shell
@@ -104,9 +104,9 @@ Initiate environment - populate database with generated data (this will also gen
 python cli/initiate_environment.py
 ```
 
-You can train agent now
+You can train agent now, for example:
 ```shell
-python cli/train_agent.py
+nohup python cli/train_agent.py &> data/train.log
 ```
 
 In case you want to run single benchmark on current database configuration

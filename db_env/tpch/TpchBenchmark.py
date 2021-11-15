@@ -39,7 +39,8 @@ class TpchBenchmark(Benchmark):
         return (power_size * throughput_size) ** (1 / 2)
 
     def _inc_refresh_file_index(self, number: int = 1):
-        self._refresh_file_index = (self._refresh_file_index + number) % MAX_REFRESH_FILE_INDEX
+        # modulo but not zero (i + m - 1) % n + 1
+        self._refresh_file_index = (self._refresh_file_index + number - 1) % MAX_REFRESH_FILE_INDEX + 1
 
     def _load_rf_id(self):
         with open(DB_REFRESH_ID, 'r') as f:

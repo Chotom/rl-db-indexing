@@ -1,6 +1,7 @@
 import datetime
 from typing import Iterator
 
+from db_env.tpch.config import MAX_REFRESH_FILE_INDEX
 from db_env.tpch.tpch_stream.RefreshPair import RefreshPair
 from db_env.tpch.tpch_stream.Stream import Stream
 
@@ -19,8 +20,10 @@ class RefreshStream(Stream):
         self.__refresh_pairs = []
 
         for i in range(stream_count):
+            # modulo, but not zero
+            file_index = (self.__file_start_index + i - 1) % MAX_REFRESH_FILE_INDEX + 1
             self.__refresh_pairs.append(
-                RefreshPair(f'refresh_pair_{i + 1}', i + self.__file_start_index, self._connection, self._cursor)
+                RefreshPair(f'refresh_pair_{i + 1}', file_index, self._connection, self._cursor)
             )
 
     def load_data(self):

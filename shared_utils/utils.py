@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import mysql
 from mysql.connector import MySQLConnection
@@ -17,7 +18,7 @@ def create_logger(name: str) -> logging.Logger:
     log_format = '%(asctime)s - %(name)s - %(levelname)s: %(message)s'
     formatter = logging.Formatter(log_format)
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(LOG_LEVEL)
     console_handler.setFormatter(formatter)
 
