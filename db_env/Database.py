@@ -57,12 +57,12 @@ class Database(ABC):
         >>> db.state
         {
             "table_name": {
-                "column_name": 1, # is indexed
-                "column_name2": 0 # without index
+                "column_name": True, # is indexed
+                "column_name2": False # without index
             },
             "table_name2": {
-                "column_name": 1, # is indexed
-                "column_name2": 1 # is indexed
+                "column_name": True, # is indexed
+                "column_name2": True # is indexed
             }
         }
 

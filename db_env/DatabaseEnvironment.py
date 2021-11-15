@@ -1,3 +1,5 @@
+import random
+
 import gym as gym
 import pandas as pd
 from gym import spaces
@@ -56,7 +58,7 @@ class DatabaseEnvironment(gym.Env):
         observation: list[bool] = []
         for table in self._db.state.values():
             for is_indexed in table.values():
-                observation.append(is_indexed)
+                observation.append(int(is_indexed))
         return observation
 
     def _get_reward(self) -> float:

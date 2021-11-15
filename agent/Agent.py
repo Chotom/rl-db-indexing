@@ -16,18 +16,19 @@ WEIGHTS_FILE = f'{PROJECT_DIR}/data/weights.csv'
 
 class Agent:
     def __init__(self, env: DatabaseEnvironment):
+        random.seed(1)
         self._log = create_logger('agent')
         self._env = env
         self.exploration_probability = 0.9
-        self.learning_rate = 0.15
+        self.exploration_probability_discount = 0.75
+        self.learning_rate = 0.01
         self.discount_factor = 0.8
-        self._weights = [np.zeros(self._env.observation_space.n + 1)
-                         for _ in range(self._env.action_space.n)]
-        """Estimated weights of features with bias for every action."""
-        self._experience_memory: List[Tuple[List[int], int, float, List[int]]] = []
-        self._experience_memory_max_size = 256
+        self._experience_memory_max_size = np.inf
         self._experience_replay_count = 32
 
+        self._weights = np.random.rand(self._env.action_space.n, self._env.observation_space.n + 1)
+        """Estimated weights of features with bias for every action."""
+        self._experience_memory: List[Tuple[List[int], int, float, List[int]]] = []
         self.dict_info = {
             'episode': int,
             'step': int,
@@ -86,7 +87,7 @@ class Agent:
         for state, action, reward, next_state in samples:
             self._update_weights(state, action, reward, next_state)
 
-    def _update_weights(self, state, action, reward, next_state):
+    def _update_weights(self, state, action, reward, next_state, value=1):
         biased_features = np.array([1] + state)
         max_action, max_q = self._get_max_action(next_state)
 
@@ -95,7 +96,7 @@ class Agent:
         td_error = td_target - approx_q
 
         # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
-        self._weights[action] += self.learning_rate * td_error * biased_features
+        self._weights[action] += self.learning_rate * td_error * biased_features * value
 
         self.dict_info['q'] = approx_q
         self.dict_info['max_a'] = max_action
@@ -138,7 +139,7 @@ class Agent:
         return max_action
 
     def _reduce_exploration_probability(self):
-        self.exploration_probability = 0.75 * self.exploration_probability
+        self.exploration_probability = self.exploration_probability_discount * self.exploration_probability
 
     def _save_agent_information(self, episode, step, state, next_state, action, reward, total_reward):
         self.dict_info['episode'] = episode
