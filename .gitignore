@@ -12,6 +12,11 @@ venv
 *.json
 *.xml
 *.zip
+*.log
+
+# data folder
+data/*
+!data/.gitkeep
 
 # tpch
 ./db_env/tpch/tpch_generator/tpch_tools/

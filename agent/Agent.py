@@ -1,6 +1,7 @@
+import queue
 import random
 import csv
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -23,22 +24,25 @@ class Agent:
         self._weights = [np.zeros(self._env.observation_space.n + 1)
                          for _ in range(self._env.action_space.n)]
         """Estimated weights of features with bias for every action."""
+        self._experience_memory: List[Tuple[List[int], int, float, List[int]]] = []
+        self._experience_memory_max_size = 256
+        self._experience_replay_count = 32
 
         self.dict_info = {
-            'episode':                  int,
-            'step':                     int,
-            'state':                    List[bool],
-            'action':                   int,
-            'reward':                   float,
-            'next_state':               List[bool],
-            'q':                        float,
-            'max_a':                    int,
-            'max_q':                    float,
-            'td_target':                float,
-            'td_error':                 float,
-            'total_reward':             float,
-            'exploration_probability':  float,
-            'random_action':            bool
+            'episode': int,
+            'step': int,
+            'state': List[bool],
+            'action': int,
+            'reward': float,
+            'next_state': List[bool],
+            'q': float,
+            'max_a': int,
+            'max_q': float,
+            'td_target': float,
+            'td_error': float,
+            'total_reward': float,
+            'exploration_probability': float,
+            'random_action': bool
         }
 
     def train(self, episode_count: int, steps_per_episode: int):
@@ -62,9 +66,25 @@ class Agent:
                 self._save_agent_information(episode, step, state, next_state, action, reward, total_reward)
                 self._save_agent_weights()
 
+                self._experience_replay()
+                self._experience_append(state, action, reward, next_state)
+
                 state = next_state
 
             self._reduce_exploration_probability()
+
+    def _experience_append(self, state, action, reward, next_state):
+        self._experience_memory.append((state, action, reward, next_state))
+
+        if len(self._experience_memory) > self._experience_memory_max_size:
+            self._experience_memory.pop()
+
+    def _experience_replay(self):
+        samples_count = min(len(self._experience_memory), self._experience_replay_count)
+        samples = random.sample(self._experience_memory, k=samples_count)
+
+        for state, action, reward, next_state in samples:
+            self._update_weights(state, action, reward, next_state)
 
     def _update_weights(self, state, action, reward, next_state):
         biased_features = np.array([1] + state)
