@@ -56,7 +56,7 @@ class Agent:
             total_reward = 0.0
 
             for step in range(steps_per_episode):
-                self._log.info(f'EPISODE {episode + 1} - STEP {step + 1} '
+                self._log.info(f'EPISODE {episode} - STEP {step} '
                                f'({(episode_count - episode) * steps_per_episode - step - 1} more steps to go)')
 
                 action = self._choose_action(state)

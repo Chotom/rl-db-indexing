@@ -1,12 +1,12 @@
 from shared_utils.consts import PROJECT_DIR
 
-SCALE_FACTOR = 1
+SCALE_FACTOR = 0.1
 """Database size in GB"""
 
 STREAM_COUNT = 2
 """Parallel stream number in throughput test"""
 
-MAX_REFRESH_FILE_INDEX = 4000
+MAX_REFRESH_FILE_INDEX = 2000
 """Max refresh file index from tpc-h documentation"""
 
 DB_GENERATOR_TOOL = f'{PROJECT_DIR}/dbgen'

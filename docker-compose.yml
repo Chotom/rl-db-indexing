@@ -22,5 +22,6 @@ services:
       - db.env
     volumes:
       - ./db_env:/project/db_env
+      - ./data:/project/data
       - ./agent:/project/agent
       - ./cli:/project/cli

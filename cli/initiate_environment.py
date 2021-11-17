@@ -5,4 +5,4 @@ if __name__ == '__main__':
     generator.reset_db()
     generator.generate_data()
     generator.load_db()
-    generator.generate_refresh_data()
+    # generator.generate_refresh_data()

@@ -18,11 +18,10 @@ class TpchDatabase(Database):
         table_name, key_name, action_name = self.action_mapper[action]
         index_name = f'{table_name}_{key_name}_index'
 
+        self._log.info(f"Executing action - {action_name} '{index_name}'")
         if action_name == "DROP INDEX":
-            self._log.info(f"Executing action - drop index '{index_name}'")
             sql = f'DROP INDEX {index_name} ON {table_name}'
         else:
-            self._log.info(f"Executing action - create index '{index_name}'")
             sql = f'CREATE INDEX {index_name} ON {table_name} ({key_name})'
 
         cursor.execute(sql)
@@ -42,12 +41,7 @@ class TpchDatabase(Database):
         for table_name, key_name in TPCH_MUTABLE_COLUMNS:
             index_name = f'{table_name}_{key_name}_index'
 
-            # check if index exists
-            sql = f"SHOW INDEX FROM {table_name} WHERE KEY_NAME = '{index_name}'"
-            cursor.execute(sql)
-
-            # drop if exists
-            if len(cursor.fetchall()) > 0:
+            if self._index_exist(cursor, table_name, index_name):
                 self._log.info(f"Dropping index '{index_name}'")
                 sql = f'DROP INDEX {index_name} ON {table_name}'
                 cursor.execute(sql)
@@ -63,18 +57,18 @@ class TpchDatabase(Database):
 
         self._log.info('Mapping database state')
 
-        state = dict()
-        for table_name, key_name in TPCH_MUTABLE_COLUMNS:
-            state[table_name] = dict()
-
+        state = {table_name: dict() for table_name, _ in TPCH_MUTABLE_COLUMNS}
         for table_name, key_name in TPCH_MUTABLE_COLUMNS:
             index_name = f'{table_name}_{key_name}_index'
-            sql = f"SHOW INDEX FROM {table_name} WHERE KEY_NAME = '{index_name}'"
-            cursor.execute(sql)
-
-            state[table_name][key_name] = (len(cursor.fetchall()) > 0)
+            state[table_name][key_name] = self._index_exist(cursor, table_name, index_name)
 
         cursor.close()
         connection.close()
 
         return state
+
+    def _index_exist(self, cursor, table_name: str, index_name: str) -> bool:
+        sql = f"SHOW INDEX FROM {table_name} WHERE KEY_NAME = '{index_name}'"
+        cursor.execute(sql)
+
+        return len(cursor.fetchall()) > 0

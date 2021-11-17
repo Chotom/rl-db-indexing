@@ -24,12 +24,13 @@ SCALE_FACTOR = 0.1  # Preferred 1 or 0.1 for local usage
 
 ```shell
 docker-compose up -d
+docker-compose up -d --build # if docker images require to be rebuild or create
 ```
 
 4. Generate data and load database to mysql_server in container
 
 ```shell
-docker-compose exec client python3 /project/db_env/tpch/TpchGenerator.py
+docker-compose exec client python3 /project/cli/initiate_environment.py
 ```
 ---
 
