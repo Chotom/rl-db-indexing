@@ -72,7 +72,7 @@ class Agent:
                 action = self._choose_action(state)
                 next_state, reward, _, info = self._env.step(action)
                 total_reward += reward
-                previous_weights = self._weights
+                previous_weights = self._weights.copy()
                 self._update_weights(state, action, reward, next_state, self._weights)
                 self._save_agent_information(episode, step, state, next_state, action, reward, total_reward, info)
                 self._experience_replay(previous_weights)
