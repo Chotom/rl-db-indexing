@@ -44,7 +44,8 @@ class Agent:
             'td_error': float,
             'total_reward': float,
             'exploration_probability': float,
-            'random_action': bool
+            'random_action': bool,
+            'initial_state_reward': float
         }
 
         self._pause_request = False
@@ -69,11 +70,11 @@ class Agent:
                                f'({(episode_count - episode) * steps_per_episode - step - 1} more steps to go)')
 
                 action = self._choose_action(state)
-                next_state, reward, _, _ = self._env.step(action)
+                next_state, reward, _, info = self._env.step(action)
                 total_reward += reward
                 previous_weights = self._weights
                 self._update_weights(state, action, reward, next_state, self._weights)
-                self._save_agent_information(episode, step, state, next_state, action, reward, total_reward)
+                self._save_agent_information(episode, step, state, next_state, action, reward, total_reward, info)
                 self._experience_replay(previous_weights)
                 self._experience_append(state, action, reward, next_state)
                 self._save_agent_weights()
@@ -151,7 +152,7 @@ class Agent:
     def _reduce_exploration_probability(self):
         self.exploration_probability = self.exploration_probability_discount * self.exploration_probability
 
-    def _save_agent_information(self, episode, step, state, next_state, action, reward, total_reward):
+    def _save_agent_information(self, episode, step, state, next_state, action, reward, total_reward, info):
         self.dict_info['episode'] = episode
         self.dict_info['step'] = step
         self.dict_info['state'] = state
@@ -159,6 +160,7 @@ class Agent:
         self.dict_info['action'] = action
         self.dict_info['reward'] = reward
         self.dict_info['total_reward'] = total_reward
+        self.dict_info['initial_state_reward'] = info['initial_state_reward']
 
         with open(AGENT_CSV_FILE, 'a', newline='') as file:
             wr = csv.writer(file)

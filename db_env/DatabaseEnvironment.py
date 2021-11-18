@@ -1,6 +1,7 @@
 import random
 
 import gym as gym
+import numpy as np
 import pandas as pd
 from gym import spaces
 from contextlib import closing
@@ -16,11 +17,13 @@ REWARDS_FILE = f'{PROJECT_DIR}/data/reward_cache.csv'
 class DatabaseEnvironment(gym.Env):
     metadata = {'render.modes': ['ansi']}
 
-    def __init__(self, db: Database):
+    def __init__(self, db: Database, use_cache: bool = False):
         super(DatabaseEnvironment, self).__init__()
 
         self._db = db
+        self._use_cache = use_cache
         self._reward_cache: dict[int, float] = {}
+        self._initial_state_reward: float = -np.inf
 
         self.action_space = spaces.Discrete(len(db.action_mapper))
         self.observation_space = spaces.MultiBinary(int(self.action_space.n / 2))
@@ -30,10 +33,11 @@ class DatabaseEnvironment(gym.Env):
         return (self._get_observation(),  # Observation
                 self._get_reward(),  # Reward
                 False,  # is Episode done
-                '{}')  # Additional info
+                {'initial_state_reward': self._initial_state_reward})  # Additional info
 
     def reset(self):
         self._db.reset_indexes()
+        self._initial_state_reward = self._db.execute_benchmark()
         return self._get_observation()
 
     def render(self, mode='ansi'):
@@ -68,6 +72,8 @@ class DatabaseEnvironment(gym.Env):
 
         :return: Measured or saved result from benchmark
         """
+        if not self._use_cache:
+            return self._db.execute_benchmark()
 
         key = str(self._get_observation())
         if key in self._reward_cache.keys():

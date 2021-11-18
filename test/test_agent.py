@@ -9,7 +9,7 @@ from agent.Agent import Agent
 class TestAgent(unittest.TestCase):
     def test_train(self):
         db = MockDatabase()
-        db_env = DatabaseEnvironment(db)
+        db_env = DatabaseEnvironment(db, True)
         agent = Agent(db_env)
 
         agent.train(20, 200)
@@ -17,7 +17,7 @@ class TestAgent(unittest.TestCase):
 
     def test_RandomTpchMockDatabase(self):
         db = RandomTpchMockDatabase()
-        db_env = DatabaseEnvironment(db)
+        db_env = DatabaseEnvironment(db, True)
         agent = Agent(db_env)
 
         agent.train(50, 100)
