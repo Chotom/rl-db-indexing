@@ -13,7 +13,6 @@ class RandomTpchMockDatabase(Database):
 
     Possible states and their benchmark results are based on reward array.
     """
-    random.seed(1)
     _database_schema_as_dict = {
         'nation': {
             'n_name': False,
@@ -82,6 +81,7 @@ class RandomTpchMockDatabase(Database):
         super().__init__(benchmark)
         # self._benchmark_results = self._mock_benchmark_results()
         self.reset_indexes()
+        self.random_generator = random.Random(1)
 
     def execute_action(self, action: int) -> None:
         db_action = self.action_mapper[action]
@@ -91,7 +91,7 @@ class RandomTpchMockDatabase(Database):
         # return self._benchmark_results[str(self._get_mapped_state())]
         if sum(self._get_mapped_state()) == 0:
             return 1000
-        return random.randint(500, 2500)
+        return self.random_generator.randint(500, 2500)
 
     def reset_indexes(self) -> None:
         for table_name, cols in self._state.items():
@@ -100,39 +100,6 @@ class RandomTpchMockDatabase(Database):
 
     def _get_current_mapped_database(self) -> dict[str, dict[str, bool]]:
         return self._database_schema_as_dict
-
-    # def _mock_benchmark_results(self):
-    #     results = {str(self._get_mapped_state()): 1000}
-    #     state_len = 20
-    #     state_number = 2 ** self.state_len - 1
-    #
-    #     # [2, 4, 8, 16, ... 2^(s+1)]
-    #     mod = [2 ** (s + 1) for s in range(self.state_len)]
-    #
-    #     # [0, 1, 3, 7, ... 2^s - 1]
-    #     r_mod = [2 ** s - 1 for s in range(self.state_len)]
-    #
-    #     # [1, 3, 5, ...]
-    #     action_to_execute = [2 * s + 1 for s in range(self.state_len)]
-    #
-    #     base_reward_for_action = [800, 1300, 1100, 1000, 800, 1500, 1000, 1200, 900, 1100,
-    #                               1000, 1700, 1200, 1900, 900, 1100, 1000, 1000, 1000, 2000,
-    #                               800, 1300, 1100, 1000, 800, 1500, 1000, 1200, 900, 1100,
-    #                               1000, 1700, 1200, 1900, 900, 1100, 1000, 1000, 1000, 2000]
-    #
-    #     print(f'{str(self._get_mapped_state())}: {results[str(self._get_mapped_state())]}')
-    #     for i in range(state_number):
-    #         for s, modulo in enumerate(mod):
-    #             if i % modulo == r_mod[s]:
-    #                 self.execute_action(action_to_execute[s])
-    #                 action_to_execute[s] = 2 * s + (action_to_execute[s] + 1) % 2
-    #                 # results[str(self._get_mapped_state())] = base_reward_for_action[action_to_execute[s]] + random.randint(-100, 500)
-    #                 results[str(self._get_mapped_state())] = random.randint(500, 2500)
-    #                 # print(f'{str(self._get_mapped_state())}: {results[str(self._get_mapped_state())]}')
-    #
-    #     print(f'MAX REWARD - {max(results, key=results.get)}: {max(results.values())}')
-    #     print(f'AVG REWARD - {sum(results.values()) / len(results)}')
-    #     return results
 
     def _get_mapped_state(self) -> List[bool]:
         """:return: Map database state to environment observation"""

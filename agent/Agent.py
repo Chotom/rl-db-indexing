@@ -17,6 +17,7 @@ WEIGHTS_FILE = f'{PROJECT_DIR}/data/weights.csv'
 class Agent:
     def __init__(self, env: DatabaseEnvironment):
         random.seed(1)
+        np.random.seed(1)
         self._log = create_logger('agent')
         self._env = env
         self.exploration_probability = 0.9
@@ -62,14 +63,12 @@ class Agent:
                 action = self._choose_action(state)
                 next_state, reward, _, _ = self._env.step(action)
                 total_reward += reward
-
-                self._update_weights(state, action, reward, next_state)
+                previous_weights = self._weights
+                self._update_weights(state, action, reward, next_state, self._weights)
                 self._save_agent_information(episode, step, state, next_state, action, reward, total_reward)
-                self._save_agent_weights()
-
-                self._experience_replay()
+                self._experience_replay(previous_weights)
                 self._experience_append(state, action, reward, next_state)
-
+                self._save_agent_weights()
                 state = next_state
 
             self._reduce_exploration_probability()
@@ -80,23 +79,23 @@ class Agent:
         if len(self._experience_memory) > self._experience_memory_max_size:
             self._experience_memory.pop()
 
-    def _experience_replay(self):
+    def _experience_replay(self, previous_weights):
         samples_count = min(len(self._experience_memory), self._experience_replay_count)
         samples = random.sample(self._experience_memory, k=samples_count)
 
         for state, action, reward, next_state in samples:
-            self._update_weights(state, action, reward, next_state)
+            self._update_weights(state, action, reward, next_state, previous_weights)
 
-    def _update_weights(self, state, action, reward, next_state, value=1):
+    def _update_weights(self, state, action, reward, next_state, weights):
         biased_features = np.array([1] + state)
         max_action, max_q = self._get_max_action(next_state)
 
-        approx_q = self._weights[action] @ biased_features
+        approx_q = weights[action] @ biased_features
         td_target = reward + self.discount_factor * max_q
         td_error = td_target - approx_q
 
         # w = w + a(r + y(max q) - w^T * F(s)) * F(s)
-        self._weights[action] += self.learning_rate * td_error * biased_features * value
+        self._weights[action] += self.learning_rate * td_error * biased_features
 
         self.dict_info['q'] = approx_q
         self.dict_info['max_a'] = max_action

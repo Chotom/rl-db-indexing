@@ -7,4 +7,6 @@ if __name__ == '__main__':
     env = DatabaseEnvironment(db)
     agent = Agent(env)
 
+    env.render()
     agent.train(50, 100)
+    env.render()
