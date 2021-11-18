@@ -1,6 +1,6 @@
-import queue
 import random
 import csv
+import signal
 from typing import List, Tuple
 
 import numpy as np
@@ -47,6 +47,14 @@ class Agent:
             'random_action': bool
         }
 
+        self._pause_request = False
+
+        def signal_handler(sig, frame):
+            self._log.info('CTRL+C pressed - pausing training requested')
+            self._pause_request = True
+
+        signal.signal(signal.SIGINT, signal_handler)
+
     def train(self, episode_count: int, steps_per_episode: int):
         with open(AGENT_CSV_FILE, 'w', newline='') as file:
             wr = csv.writer(file)
@@ -70,6 +78,9 @@ class Agent:
                 self._experience_append(state, action, reward, next_state)
                 self._save_agent_weights()
                 state = next_state
+
+                if self._pause_request:
+                    return
 
             self._reduce_exploration_probability()
 
