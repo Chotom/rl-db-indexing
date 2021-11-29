@@ -107,15 +107,20 @@ python cli/initiate_environment.py
 
 You can train agent now, for example:
 ```shell
-nohup python cli/train_agent.py &> data/train.log
+nohup python cli/train_agent.py &> data/train.log &
 ```
 
-In case you want to run single benchmark on current database configuration
+You can stop training at any time (without need of resetting environment) by sending it SINGINT (CTRL+C), for example:
+```shell
+kill -2 {pid}
+```
+
+In case you want to run single benchmark on current database configuration:
 ```shell
 python cli/run_benchmark.py
 ```
 
-Or if you want to reset database (without generating data for benchmark again)
+Or if you want to reset database (without generating data for benchmark again):
 ```shell
 python cli/run_benchmark.py
 ```
