@@ -1,0 +1,101 @@
+-- Sccsid:     @(#)dss.ri	2.1.8.1
+-- TPCD Benchmark Version 8.0
+
+USE tpcd;
+
+-- ALTER TABLE tpcd.region DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.nation DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.part DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.supplier DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.partsupp DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.orders DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.lineitem DROP PRIMARY KEY;
+-- ALTER TABLE tpcd.customer DROP PRIMARY KEY;
+
+
+-- For table REGION
+ALTER TABLE tpcd.region
+ADD PRIMARY KEY (r_regionkey);
+
+-- For table NATION
+ALTER TABLE tpcd.nation
+ADD PRIMARY KEY (n_nationkey);
+
+ALTER TABLE tpcd.nation
+ADD FOREIGN KEY nation_fk1 (n_regionkey) references tpcd.region(r_regionkey);
+
+COMMIT WORK;
+
+-- For table part
+ALTER TABLE tpcd.part
+ADD PRIMARY KEY (p_partkey);
+
+COMMIT WORK;
+
+-- For table supplier
+ALTER TABLE tpcd.supplier
+ADD PRIMARY KEY (s_suppkey);
+
+ALTER TABLE tpcd.supplier
+ADD FOREIGN KEY supplier_fk1 (s_nationkey) references tpcd.nation(n_nationkey);
+
+COMMIT WORK;
+
+-- For table partsupp
+ALTER TABLE tpcd.partsupp
+ADD PRIMARY KEY (ps_partkey,ps_suppkey);
+
+COMMIT WORK;
+
+-- For table customer
+ALTER TABLE tpcd.customer
+ADD PRIMARY KEY (c_custkey);
+
+ALTER TABLE tpcd.customer
+ADD FOREIGN KEY customer_fk1 (c_nationkey) references tpcd.nation(n_nationkey);
+
+COMMIT WORK;
+
+-- For table lineitem
+ALTER TABLE tpcd.lineitem
+ADD PRIMARY KEY (l_orderkey,l_linenumber);
+
+COMMIT WORK;
+
+-- For table orders
+ALTER TABLE tpcd.orders
+ADD PRIMARY KEY (o_orderkey);
+
+COMMIT WORK;
+
+-- For table PARTSUPP
+ALTER TABLE tpcd.partsupp
+ADD FOREIGN KEY partsupp_fk1 (ps_suppkey) references tpcd.supplier(s_suppkey);
+
+COMMIT WORK;
+
+ALTER TABLE tpcd.partsupp
+ADD FOREIGN KEY partsupp_fk2 (ps_partkey) references tpcd.part(p_partkey);
+
+COMMIT WORK;
+
+-- For table orders
+ALTER TABLE tpcd.orders
+ADD FOREIGN KEY orders_fk1 (o_custkey) references tpcd.customer(c_custkey);
+
+COMMIT WORK;
+
+-- For table lineitem
+ALTER TABLE tpcd.lineitem
+ADD FOREIGN KEY LINEITEM_FK1 (L_ORDERKEY) references tpcd.orders(o_orderkey);
+
+COMMIT WORK;
+
+ALTER TABLE tpcd.lineitem
+ADD FOREIGN KEY lineitem_fk2 (l_partkey,l_suppkey) references
+        tpcd.partsupp(ps_partkey,ps_suppkey);
+
+COMMIT WORK;
+
+
+USE tpcd;

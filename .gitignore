@@ -1,0 +1,22 @@
+# python
+.coverage
+venv
+
+# idea
+.idea/
+*.iml
+
+# files
+*.tmp
+*.csv
+*.json
+*.xml
+*.zip
+*.log
+
+# data folder
+data/*
+!data/.gitkeep
+
+# tpch
+./db_env/tpch/tpch_generator/tpch_tools/
