@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+  mysql_server:
+    image: mysql
+    container_name: mysql_tpch_database
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - '3306:3306'
+    env_file:
+      - db.env
+
+  client:
+    build: .
+    tty: true
+    env_file:
+      - db.env
+    volumes:
+      - ./db_env:/project/db_env
+      - ./data:/project/data
+      - ./agent:/project/agent
+      - ./cli:/project/cli
