@@ -1,5 +1,6 @@
 # python
 .coverage
+*/__pycache__
 venv
 
 # idea
@@ -13,6 +14,8 @@ venv
 *.xml
 *.zip
 *.log
+*.png
+*.jpg
 
 # data folder
 data/*
