@@ -89,7 +89,7 @@ class Agent:
         self._experience_memory.append((state, action, reward, next_state))
 
         if len(self._experience_memory) > self._experience_memory_max_size:
-            self._experience_memory.pop()
+            self._experience_memory.pop(0)
 
     def _experience_replay(self, previous_weights):
         samples_count = min(len(self._experience_memory), self._experience_replay_count)
