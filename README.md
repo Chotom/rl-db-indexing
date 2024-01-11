@@ -72,7 +72,7 @@ This should only be used for testing or if you are certain, that you can provide
 Project currently only supports Linux client, because of DBGen. However, it should be possible to compile
 DBGen on Windows as well.
 
-1. Update file [.env](.env) with MySQL server data (user, password, server IP, port and database name, which will be
+1. Update file [.env](.env) with MySQL server data (user, password, server IP, port and name of the database, which will be
 used for benchmarking).
 
 2. Install gcc, make, python (minimal version is 3.8), pip and virtualenv.
