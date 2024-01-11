@@ -1,6 +1,6 @@
 from db_env.tpch.TpchDatabase import TpchDatabase
 from db_env.DatabaseEnvironment import DatabaseEnvironment
-from agent.Agent import Agent
+from agent.AgentActionFeatures import Agent
 
 if __name__ == '__main__':
     db = TpchDatabase()
