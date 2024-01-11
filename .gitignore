@@ -16,10 +16,12 @@ venv
 *.log
 *.png
 *.jpg
+*.svg
 
 # data folder
 data/*
 !data/.gitkeep
 
 # tpch
-./db_env/tpch/tpch_generator/tpch_tools/
+dbgen
+db_env/tpch/tpch_tools

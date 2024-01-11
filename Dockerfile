@@ -3,7 +3,6 @@ FROM ubuntu:20.04
 RUN true \
     && apt-get -y update \
     && apt-get -y install make gcc \
-    && apt-get -y install mysql-client \
     && apt-get -y install python3 \
     && apt-get -y install pip
 
