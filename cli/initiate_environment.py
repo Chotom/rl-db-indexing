@@ -6,3 +6,4 @@ if __name__ == '__main__':
     generator.generate_data()
     generator.load_db()
     # generator.generate_refresh_data()
+    generator.generate_fixed_refresh_data()

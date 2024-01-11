@@ -6,8 +6,8 @@ SCALE_FACTOR = 0.1
 STREAM_COUNT = 2
 """Parallel stream number in throughput test"""
 
-MAX_REFRESH_FILE_INDEX = 2000
-"""Max refresh file index from tpc-h documentation"""
+MAX_REFRESH_FILE_INDEX = 1998
+"""Max refresh file index (should be 4000 according to TPC-H documentation, but is 1998 for our fixed data)"""
 
 DB_GENERATOR_TOOL = f'{PROJECT_DIR}/dbgen'
 """Path to dbgen tpch tool"""
