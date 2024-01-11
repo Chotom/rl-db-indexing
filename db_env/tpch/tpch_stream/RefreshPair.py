@@ -74,7 +74,7 @@ class RefreshPair:
         self.execute_refresh_function2()
 
         self._log.info(
-            f'Execution of refresh pair {self.__run_number} ended successful. Measured time: {self.__rf1_time + self.__rf2_time}')
+            f'Execution of refresh pair {self.__run_number} ended successfully. Measured time: {self.__rf1_time + self.__rf2_time}')
 
     def execute_refresh_function1(self):
         self._log.info('Run refresh function 1...')
@@ -99,7 +99,7 @@ class RefreshPair:
 
         self._df_measures = self._df_measures.append({'name': f'RF1_{self.__run_number}', 'time': self.__rf1_time},
                                                      ignore_index=True)
-        self._log.info(f'Execution of refresh function 1 ended successful. Measured time: {self.__rf1_time}')
+        self._log.info(f'Execution of refresh function 1 ended successfully. Measured time: {self.__rf1_time}')
 
     def execute_refresh_function2(self):
         self._log.info('Run refresh function 2...')
@@ -124,7 +124,7 @@ class RefreshPair:
 
         self._df_measures = self._df_measures.append({'name': f'RF2_{self.__run_number}', 'time': self.__rf2_time},
                                                      ignore_index=True)
-        self._log.info(f'Execution of refresh function 2 ended successful. Measured time: {self.__rf2_time}')
+        self._log.info(f'Execution of refresh function 2 ended successfully. Measured time: {self.__rf2_time}')
 
     @property
     def df_measures(self) -> pd.DataFrame:

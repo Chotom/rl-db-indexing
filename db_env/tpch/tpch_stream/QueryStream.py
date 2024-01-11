@@ -50,4 +50,4 @@ class QueryStream(Stream):
                 self._log.debug(f'Cursor:\n {cur}')
                 if cur.with_rows:
                     self._log.debug(f'Results:\n {cur.fetchall()}')
-        self._log.info(f'Execution of query stream ended successful. Measured time: {self._df_measures["time"].sum()}')
+        self._log.info(f'Execution of query stream ended successfully. Measured time: {self._df_measures["time"].sum()}')
